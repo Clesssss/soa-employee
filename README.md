@@ -30,9 +30,7 @@
     "name": "Richard Kamitono",
     "email": "r@gmail.com",
     "role": "unassigned",
-    "salary_per_shift": -1,
-    "createdAt": "2021-02-01T10:08:23.000Z",
-    "updatedAt": "2021-02-01T10:08:23.000Z"
+    "salary_per_shift": -1
   }
 }
 ```
@@ -68,8 +66,6 @@
         "email": "r@gmail.com",
         "role": "unassigned",
         "salary_per_shift": -1,
-        "createdAt": "2024-12-04T12:35:54.602Z",
-        "updatedAt": "2024-12-04T12:35:54.602Z",
         "accessToken": <Token>
     }
 }
@@ -132,9 +128,7 @@
     "name": "Richard Kamitono",
     "email": "r@gmail.com",
     "role": "unassigned",
-    "salary_per_shift": -1,
-    "created_at": "2025-05-21T08:00:00Z",
-    "updated_at": "2025-05-21T08:00:00Z"
+    "salary_per_shift": -1
   }
 }
 ```
@@ -181,15 +175,22 @@
 ```json
 {
   "message": "Employee retrieved successfully",
-  "data": {
+  "data": [
+  {
     "id": 1,
     "name": "Richard Kamitono",
     "email": "r@gmail.com",
     "role": "unassigned",
-    "salary_per_shift": -1,
-    "created_at": "2025-05-21T08:00:00Z",
-    "updated_at": "2025-05-21T08:00:00Z"
+    "salary_per_shift": -1
+  },
+  {
+    "id": 1,
+    "name": "Richard Kamitono",
+    "email": "r@gmail.com",
+    "role": "unassigned",
+    "salary_per_shift": -1
   }
+  ]
 }
 ```
 
