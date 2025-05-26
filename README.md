@@ -75,7 +75,7 @@
 
 **URL**: `/employee/logout`
 
-**Method**: `DELETE`
+**Method**: `POST`
 
 **Description**: Logout Employee.
 
@@ -87,17 +87,27 @@
 }
 ```
 
-**Response**:
+**Success Response**:
 
-- Status: `200 - Ok`
-- Body:
+- **Status**: `200 OK`  
+  **Body**:
+  ```json
+  {
+    "message": "User logged out successfully",
+    "data": true
+  }
+  ```
 
-```json
-{
-  "message": "User logged out successfully",
-  "data": true
-}
-```
+
+**Error Responses**:
+
+- **Status**: `401 Unauthorized`  
+  **Body**:
+  ```json
+  {
+    "error": "Invalid or expired token"
+  }
+  ```
 
 ### 4. Get employee by ID
 

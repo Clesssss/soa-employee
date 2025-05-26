@@ -26,7 +26,7 @@ class DatabaseWrapper:
 
     def get_employee_by_id(self, id):
         cursor = self.connection.cursor(dictionary=True)
-        sql = "SELECT id, name, email, role, salary_per_shift FROM employee WHERE id = %s"
+        sql = "SELECT id, name, email, role, salary_per_shift, access_token FROM employee WHERE id = %s"
         cursor.execute(sql, (id,))
         result = cursor.fetchone()
         cursor.close()

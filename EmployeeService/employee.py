@@ -62,15 +62,22 @@ class EmployeeService:
             if not employee_id:
                 return False, "Invalid token payload"
 
-            success = self.logout_employee(employee_id)
+            success, error = self.logout_employee(employee_id, token)
             if not success:
-                return False, "Failed to log out"
+                return False, error
 
             return True, None
         except Exception as e:
-            return False, str(e)
+            return False, "Invalid or expired token"
 
     @rpc
-    def logout_employee(self, employee_id):
+    def logout_employee(self, employee_id, token):
+        employee = self.get_employee_by_id(employee_id)
+        if not employee or employee.get("access_token") != token:
+            return False, "Invalid token"
+
         success = self.database.delete_access_token(employee_id)
-        return success
+        if not success:
+            return False, "Invalid token"
+
+        return True, None
