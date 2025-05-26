@@ -19,6 +19,20 @@ class EmployeeService:
         return employee
 
     @rpc
+    def get_employee_by_token(self, token):
+        try:
+            payload = decode_token(token)
+            employee_data = {
+                "id": payload.get("id"),
+                "name": payload.get("name"),
+                "email": payload.get("email"),
+                "role": payload.get("role")
+            }
+            return employee_data
+        except Exception:
+            return None
+
+    @rpc
     def get_employee_by_email(self, email):
         employee = self.database.get_employee_by_email(email)
         return employee
@@ -37,7 +51,7 @@ class EmployeeService:
         if not verify_password(password, employee['password'].encode('utf-8')):
             return None, "Incorrect password"
 
-        token = generate_access_token(employee["id"], employee["email"], employee["role"])
+        token = generate_access_token(employee["id"], employee["name"], employee["email"], employee["role"])
 
         success = self.database.save_access_token(employee["id"], token)
         if not success:

@@ -20,6 +20,26 @@ class GatewayService:
             return json.dumps({'message': 'Employee retreived successfully', 'data': employee})
         return 404, json.dumps({'error': 'Employee not found'})
 
+    @http('GET', '/employee/me')
+    def get_employee_me(self, request):
+        auth_header = request.headers.get('authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return 401, json.dumps({'error': 'Unauthorized'})
+
+        token = auth_header.split(" ")[1]
+
+        try:
+            employee = self.employee_rpc.get_employee_by_token(token)
+            if not employee:
+                return 401, json.dumps({'error': 'Invalid token'})
+
+            return 200, json.dumps({
+                "message": "Employee retrieved successfully",
+                "data": employee
+            })
+        except Exception:
+            return 401, json.dumps({'error': 'Invalid or expired token'})
+
     @http('POST', '/employee')
     def register_employee(self, request):
         try:
@@ -75,3 +95,4 @@ class GatewayService:
             return 401, json.dumps({'error': error})
 
         return 200, json.dumps({'message': 'User logged out successfully', 'data': True})
+

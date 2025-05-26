@@ -13,9 +13,10 @@ def hash_password(password: str) -> bytes:
 def verify_password(password: str, hashed: bytes) -> bool:
     return bcrypt.checkpw(password.encode('utf-8'), hashed)
 
-def generate_access_token(employee_id: int, email: str, role: str) -> str:
+def generate_access_token(employee_id: int, name: str, email: str, role: str) -> str:
     payload = {
         "id": employee_id,
+        "name": name,
         "email": email,
         "role": role,
         "exp": datetime.utcnow() + timedelta(days=1),

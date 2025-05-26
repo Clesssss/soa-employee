@@ -204,4 +204,36 @@
 }
 ```
 
+### 5. Get Authenticated Employee
+
+**URL**: `/employee/me` 
+
+**Method**: `GET`  
+
+**Description**: Retrieves details of the currently authenticated employee using the access token.
+
+**Request Header**:
+
+```json
+{
+  "authorization": "Bearer <token>"
+}
+```
+
+**Response**:
+
+- **Status**: `200 OK`  
+  **Body**:
+  ```json
+  {
+    "message": "Employee retrieved successfully",
+    "data": {
+      "id": 1,
+      "name": "Richard Kamitono",
+      "email": "r@gmail.com",
+      "role": "unassigned",
+      "salary_per_shift": -1
+    }
+  }
+  ```
 
