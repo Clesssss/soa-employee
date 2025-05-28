@@ -254,7 +254,7 @@
 
 ### 6. Entry Schedule
 
-**URL**: `/schedule`
+**URL**: `/employee/schedule`
 
 **Method**: `POST`
 
@@ -272,10 +272,9 @@
 
 ```json
 {
-  "employee_id": 1,
+  "employee_id": 4,
   "date": "2025-05-28",
-  "shift": "day",
-  "role": "cashier"
+  "shift_type": "day"
 }
 ```
 
@@ -288,12 +287,11 @@
 {
   "message": "Schedule entry created successfully",
   "data": {
-    "id": 12,
-    "employee_id": 1,
+    "id": 0,
+    "employee_id": 4,
     "date": "2025-05-28",
-    "shift": "day",
-    "role": "cashier"
-  }
+    "shift_type": "day"
+  }    
 }
 ```
 
@@ -301,11 +299,11 @@
 
 ### 7. Batch Entry Schedule
 
-**URL**: `/schedule/batch`
+**URL**: `/employee/schedule/batch`
 
 **Method**: `POST`
 
-**Description**: Create multiple schedule entries for the same date, shift, and role.
+**Description**: Create multiple schedule entries for the same date and shift.
 
 **Request Header**:
 
@@ -317,14 +315,11 @@
 
 **Request Body**:
 
-```json
 {
+  "employee_ids": [2, 3],
   "date": "2025-05-28",
-  "shift": "day",
-  "role": "waiter",
-  "employee_ids": [2, 3, 4]
+  "shift_type": "day"
 }
-```
 
 **Response**:
 
@@ -333,27 +328,19 @@
 
 ```json
 {
-  "message": "Batch schedule created successfully",
-  "data": [
-    {
-      "employee_id": 2,
-      "date": "2025-05-28",
-      "shift": "day",
-      "role": "waiter"
-    },
-    {
-      "employee_id": 3,
-      "date": "2025-05-28",
-      "shift": "day",
-      "role": "waiter"
-    },
-    {
-      "employee_id": 4,
-      "date": "2025-05-28",
-      "shift": "day",
-      "role": "waiter"
-    }
-  ]
+    "message": "Batch schedule created successfully",
+    "data": [
+        {
+            "employee_id": 2,
+            "date": "2025-05-28",
+            "shift_type": "day"
+        },
+        {
+            "employee_id": 3,
+            "date": "2025-05-28",
+            "shift_type": "day"
+        }
+    ]
 }
 ```
 
@@ -361,11 +348,13 @@
 
 ### 8. Edit Schedule
 
-**URL**: `/schedule/:id`
+**URL**: `employee/schedule/:id`
 
 **Method**: `PUT`
 
 **Description**: Update an existing schedule entry by ID.
+
+**Note**: Only the note and attendance fields can be updated. If you need to change the employee_id, date, or shift_type, please delete the existing row and create a new one to maintain schedule uniqueness.
 
 **Request Header**:
 
@@ -379,10 +368,8 @@
 
 ```json
 {
-  "employee_id": 1,
-  "date": "2025-05-29",
-  "shift": "night",
-  "role": "chef"
+  "note": "test",
+  "attendance": 0
 }
 ```
 
@@ -393,14 +380,15 @@
 
 ```json
 {
-  "message": "Schedule updated successfully",
-  "data": {
-    "id": 12,
-    "employee_id": 1,
-    "date": "2025-05-29",
-    "shift": "night",
-    "role": "chef"
-  }
+    "message": "Schedule updated successfully",
+    "data": {
+        "id": 5,
+        "employee_id": 2,
+        "date": "2025-05-28",
+        "shift_type": "day",
+        "note": "test",
+        "attendance": 0
+    }
 }
 ```
 
@@ -408,7 +396,7 @@
 
 ### 9. Fetch Schedule by Date & Shift
 
-**URL**: `/schedule`
+**URL**: `employee/schedule`
 
 **Method**: `GET`
 
@@ -420,7 +408,7 @@
 | `shift` | `string` | yes      | `day` or `night`          |
 
 **Example**:  
-`GET /schedule?date=2025-05-28&shift=day`
+`GET /employee/schedule?date=2025-05-28&shift=day`
 
 **Request Header**:
 
@@ -437,24 +425,32 @@
 
 ```json
 {
-  "message": "Schedule retrieved successfully",
-  "data": [
-    {
-      "id": 10,
-      "employee_id": 2,
-      "name": "Alice",
-      "role": "cashier",
-      "shift": "day",
-      "date": "2025-05-28"
-    },
-    {
-      "id": 11,
-      "employee_id": 3,
-      "name": "Bob",
-      "role": "waiter",
-      "shift": "day",
-      "date": "2025-05-28"
-    }
-  ]
+    "message": "Schedule retrieved successfully",
+    "data": [
+        {
+            "id": 5,
+            "employee_id": 2,
+            "name": "Richard Kamitono",
+            "role": "unassigned",
+            "shift_type": "day",
+            "date": "2025-05-28"
+        },
+        {
+            "id": 6,
+            "employee_id": 3,
+            "name": "Richard Kamitono",
+            "role": "unassigned",
+            "shift_type": "day",
+            "date": "2025-05-28"
+        },
+        {
+            "id": 1,
+            "employee_id": 4,
+            "name": "Richard Kamitono",
+            "role": "unassigned",
+            "shift_type": "day",
+            "date": "2025-05-28"
+        }
+    ]
 }
 ```
