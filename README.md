@@ -254,7 +254,7 @@
 
 ### 6. Entry Schedule
 
-**URL**: `/schedule`
+**URL**: `/employee/schedule`
 
 **Method**: `POST`
 
@@ -301,7 +301,7 @@
 
 ### 7. Batch Entry Schedule
 
-**URL**: `/schedule/batch`
+**URL**: `/employee/schedule/batch`
 
 **Method**: `POST`
 
@@ -361,7 +361,7 @@
 
 ### 8. Edit Schedule
 
-**URL**: `/schedule/:id`
+**URL**: `employee/schedule/:id`
 
 **Method**: `PUT`
 
@@ -408,7 +408,7 @@
 
 ### 9. Fetch Schedule by Date & Shift
 
-**URL**: `/schedule`
+**URL**: `employee/schedule`
 
 **Method**: `GET`
 
