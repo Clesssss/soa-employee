@@ -1,6 +1,7 @@
+# Endpoints
+
 > **⚠️ Disclaimer:** All endpoints documented here are currently under development. Their structure, parameters, or responses may be subject to change without prior notice.
 
-# Endpoints
 ### 1. Register user
 
 **URL**: `/employee/register`
