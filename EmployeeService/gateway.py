@@ -96,3 +96,70 @@ class GatewayService:
 
         return 200, json.dumps({'message': 'User logged out successfully', 'data': True})
 
+    @http('POST', '/employee/schedule')
+    def create_schedule(self, request):
+        auth_header = request.headers.get('authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return 401, json.dumps({'error': 'Unauthorized'})
+        try:
+            data = json.loads(request.get_data(as_text=True))
+            employee_id = data.get('employee_id')
+            date = data.get('date')
+            shift_type = data.get('shift_type')
+            if not all([employee_id, date, shift_type]):
+                return 400, json.dumps({'error': 'Missing attributes'})
+            result = self.employee_rpc.create_schedule(employee_id, date, shift_type)
+            return 201, json.dumps({'message': 'Schedule entry created successfully', 'data': result})
+        except Exception as e:
+            return 500, json.dumps({'error': str(e)})
+
+    @http('POST', '/employee/schedule/batch')
+    def create_batch_schedule(self, request):
+        auth_header = request.headers.get('authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return 401, json.dumps({'error': 'Unauthorized'})
+        try:
+            data = json.loads(request.get_data(as_text=True))
+            employee_ids = data.get('employee_ids')
+            date = data.get('date')
+            shift_type = data.get('shift_type')
+            if not all([employee_ids, date, shift_type]):
+                return 400, json.dumps({'error': 'Missing attributes'})
+            result = self.employee_rpc.create_batch_schedule(employee_ids, date, shift_type)
+            return 201, json.dumps({'message': 'Batch schedule created successfully', 'data': result})
+        except Exception as e:
+            return 500, json.dumps({'error': str(e)})
+
+    @http('PUT', '/employee/schedule/<int:id>')
+    def update_schedule(self, request, id):
+        auth_header = request.headers.get('authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return 401, json.dumps({'error': 'Unauthorized'})
+        try:
+            data = json.loads(request.get_data(as_text=True))
+            note = data.get('note')  # Optional
+            attendance = data.get('attendance')  # Optional
+
+            if note is None and attendance is None:
+                return 400, json.dumps({'error': 'At least one of "note" or "attendance" must be provided'})
+
+            result = self.employee_rpc.update_schedule(id, note, attendance)
+            return 200, json.dumps({'message': 'Schedule updated successfully', 'data': result})
+        except Exception as e:
+            return 500, json.dumps({'error': str(e)})
+
+    @http('GET', '/employee/schedule')
+    def get_schedule_by_date_shift(self, request):
+        auth_header = request.headers.get('authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return 401, json.dumps({'error': 'Unauthorized'})
+        date = request.args.get('date')
+        shift_type = request.args.get('shift_type')
+        if not date or not shift_type:
+            return 400, json.dumps({'error': 'Missing query parameters'})
+        try:
+            result = self.employee_rpc.get_schedule_by_date_shift(date, shift_type)
+            return 200, json.dumps({'message': 'Schedule retrieved successfully', 'data': result})
+        except Exception as e:
+            return 500, json.dumps({'error': str(e)})
+

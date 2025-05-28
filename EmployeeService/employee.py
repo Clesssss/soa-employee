@@ -95,3 +95,19 @@ class EmployeeService:
             return False, "Invalid token"
 
         return True, None
+
+    @rpc
+    def create_schedule(self, employee_id, date, shift_type):
+        return self.database.create_schedule(employee_id, date, shift_type)
+
+    @rpc
+    def create_batch_schedule(self, employee_ids, date, shift_type):
+        return self.database.create_batch_schedule(employee_ids, date, shift_type)
+
+    @rpc
+    def update_schedule(self, schedule_id, note=None, attendance=None):
+        return self.database.update_schedule(schedule_id, note, attendance)
+
+    @rpc
+    def get_schedule_by_date_shift(self, date, shift_type):
+        return self.database.get_schedule_by_date_shift(date, shift_type)

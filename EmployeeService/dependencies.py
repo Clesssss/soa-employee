@@ -74,6 +74,82 @@ class DatabaseWrapper:
             print(f"Error deleting access token: {e}")
             return False
 
+
+    def create_schedule(self, employee_id, date, shift_type):
+        cursor = self.connection.cursor(dictionary=True)
+        sql = """
+            INSERT INTO schedule (employee_id, date, shift_type)
+            VALUES (%s, %s, %s)
+        """
+        cursor.execute(sql, (employee_id, date, shift_type))
+        self.connection.commit()
+        schedule_id = cursor.lastrowid
+        cursor.close()
+        return {
+            "id": schedule_id,
+            "employee_id": employee_id,
+            "date": date,
+            "shift_type": shift_type
+        }
+
+    def create_batch_schedule(self, employee_ids, date, shift_type):
+        cursor = self.connection.cursor(dictionary=True)
+        data = []
+        for emp_id in employee_ids:
+            cursor.execute(
+                "INSERT INTO schedule (employee_id, date, shift_type) VALUES (%s, %s, %s)",
+                (emp_id, date, shift_type)
+            )
+            data.append({
+                "employee_id": emp_id,
+                "date": date,
+                "shift_type": shift_type
+            })
+        self.connection.commit()
+        cursor.close()
+        return data
+
+    def update_schedule(self, schedule_id, note=None, attendance=None):
+        cursor = self.connection.cursor(dictionary=True)
+
+        cursor.execute("SELECT * FROM schedule WHERE id = %s", (schedule_id,))
+        existing = cursor.fetchone()
+        if not existing:
+            cursor.close()
+            raise ValueError(f"Schedule with id {schedule_id} not found")
+
+        sql = """
+               UPDATE schedule
+               SET note = COALESCE(%s, note),
+                   attendance = COALESCE(%s, attendance)
+               WHERE id = %s
+           """
+        cursor.execute(sql, (note, attendance, schedule_id))
+        self.connection.commit()
+
+        cursor.execute("SELECT * FROM schedule WHERE id = %s", (schedule_id,))
+        updated_row = cursor.fetchone()
+        updated_row['date'] = updated_row['date'].isoformat()
+
+        cursor.close()
+        return updated_row
+
+    def get_schedule_by_date_shift(self, date, shift_type):
+        cursor = self.connection.cursor(dictionary=True)
+        sql = """
+            SELECT s.id, s.employee_id, e.name, e.role, s.shift_type, s.date
+            FROM schedule s
+            JOIN employee e ON s.employee_id = e.id
+            WHERE s.date = %s AND s.shift_type = %s
+        """
+        cursor.execute(sql, (date, shift_type))
+        result = cursor.fetchall()
+        cursor.close()
+
+        for row in result:
+            row['date'] = row['date'].isoformat()
+
+        return result
 #    def __del__(self):
 #        self.connection.close()
 
