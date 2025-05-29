@@ -154,31 +154,23 @@
 
 ---
 
-### 4. Get employees
+### 5. Get All Employees (Filtered by Role and Search by Name)
 
 **URL**: `/employee`
 
-**Parameters**: 
-
-| Name         | Type       | Required | Description                                                                |
-| ------------ | ---------- | -------- | -------------------------------------------------------------------------- |
-| `role`       | `string`   | optional | (Cashier, Waiter, Chef, Delivery, Manager, Unassigned)                                                 |
-| `work_date`  | `date`     | optional | (default = today)                                      |
-| `attendance` | `boolean`  | optional | (default = 1)                                   |
-| `shift_type` | `string`   | optional | (`day` or `night`)                                    |
-
-**Example**: GET /employee?role=cashier&shift_type=day
-
-> This returns all employees with:
->  - role = cashier
->  - shift_type = day
->  - attendance = true (by default)
->  - work_date = today's date (by default)
-
-
 **Method**: `GET`
 
-**Description**: Retrieve details of a single employee.
+**Description**: Retrieve all employees with optional filters by role and search by name.
+
+**Query Parameters**:
+
+| Name   | Type     | Required | Description                            |
+|--------|----------|----------|----------------------------------------|
+| role   | string   | optional | Filter by role                         |
+| search | string   | optional | Search by name (case-insensitive match)|
+
+**Example**:  
+`GET /employee?role=Cashier&search=richard`
 
 **Request Header**:
 
@@ -190,34 +182,27 @@
 
 **Response**:
 
-- Status: `200 - Ok`
+- Status: `200 - OK`
 - Body:
 
 ```json
 {
-  "message": "Employee retrieved successfully",
+  "message": "Employees retrieved successfully",
   "data": [
-  {
-    "id": 1,
-    "name": "Richard Kamitono",
-    "email": "r@gmail.com",
-    "role": "unassigned",
-    "salary_per_shift": -1
-  },
-  {
-    "id": 1,
-    "name": "Richard Kamitono",
-    "email": "r@gmail.com",
-    "role": "unassigned",
-    "salary_per_shift": -1
-  }
+    {
+      "id": 1,
+      "name": "Richard Kamitono",
+      "email": "r@gmail.com",
+      "role": "Cashier",
+      "salary_per_shift": 150000
+    }
   ]
 }
 ```
 
 ---
 
-### 5. Get Authenticated Employee
+### 6. Get Authenticated Employee
 
 **URL**: `/employee/me` 
 
@@ -252,7 +237,98 @@
 
 ---
 
-### 6. Entry Schedule
+### 7. Edit Employee Profile (by Employee)
+
+**URL**: `/employee/:id`
+
+**Method**: `PUT`
+
+**Description**: Allows an employee to update their own profile. Only `name`, `email`, and `password` can be updated.
+
+**Authorization**: Requires access token with `employee` role.
+
+**Request Header**:
+
+```json
+{
+  "authorization": "Bearer <employee_token>"
+}
+```
+
+**Request Body**:
+
+```json
+{
+  "name": "Richard Kamitono",
+  "email": "richard@gmail.com",
+  "password": "new_secure_password"
+}
+```
+
+**Response**:
+
+- Status: `200 - OK`
+- Body:
+
+```json
+{
+  "message": "Profile updated successfully",
+  "data": {
+    "id": 1,
+    "name": "Richard Kamitono",
+    "email": "richard@gmail.com"
+  }
+}
+```
+
+---
+
+### 8. Edit Employee Profile (by Manager/Admin)
+
+**URL**: `/employee/:id`
+
+**Method**: `PUT`
+
+**Description**: Allows a manager or admin to update an employee’s profile. Editable fields include `name`, `role` and `salary_per_shift`.
+
+**Authorization**: Requires access token with `manager` role.
+
+**Request Header**:
+
+```json
+{
+  "authorization": "Bearer <admin_token>"
+}
+```
+
+**Request Body**:
+
+```json
+{
+  "name": "Richard Kamitono",
+  "role": "Cashier",
+  "salary_per_shift": 150000
+}
+```
+
+**Response**:
+
+- Status: `200 - OK`
+- Body:
+
+```json
+{
+  "message": "Employee updated successfully",
+  "data": {
+    "id": 1,
+    "name": "Richard Kamitono",
+    "role": "Cashier",
+    "salary_per_shift": 150000
+  }
+}
+```
+
+### 9. Entry Schedule
 
 **URL**: `/employee/schedule`
 
@@ -297,7 +373,7 @@
 
 ---
 
-### 7. Batch Entry Schedule
+### 10. Batch Entry Schedule
 
 **URL**: `/employee/schedule/batch`
 
@@ -346,7 +422,7 @@
 
 ---
 
-### 8. Edit Schedule
+### 11. Edit Schedule
 
 **URL**: `employee/schedule/:id`
 
@@ -394,21 +470,26 @@
 
 ---
 
-### 9. Fetch Schedule by Date & Shift
+### 12. Get Employees by Schedule (Filtered by Role, Attendance, and Search by Name)
 
-**URL**: `employee/schedule`
+**URL**: `/employee/schedule`
 
 **Method**: `GET`
 
-**Parameters**:
+**Description**: Retrieve employees scheduled on a specific date and shift. Filterable by role, attendance (optional), and searchable by name.
 
-| Name    | Type     | Required | Description               |
-| ------- | -------- | -------- | ------------------------- |
-| `date`  | `string` | yes      | Schedule date (YYYY-MM-DD)|
-| `shift` | `string` | yes      | `day` or `night`          |
+**Query Parameters**:
+
+| Name        | Type     | Required | Description                                      |
+|-------------|----------|----------|--------------------------------------------------|
+| date        | string   | yes      | Schedule date in format `YYYY-MM-DD`            |
+| shift       | string   | yes      | Shift type: `day` or `night`                    |
+| role        | string   | optional | Filter by role                                  |
+| attendance  | boolean  | optional | Filter by attendance status                     |
+| search      | string   | optional | Search by employee name (case-insensitive match)|
 
 **Example**:  
-`GET /employee/schedule?date=2025-05-28&shift=day`
+`GET /employee/schedule/employees?date=2025-05-28&shift=day&role=Cashier&attendance=true&search=richard`
 
 **Request Header**:
 
@@ -420,37 +501,23 @@
 
 **Response**:
 
-- Status: `200 - Ok`
+- Status: `200 - OK`
 - Body:
 
 ```json
 {
-    "message": "Schedule retrieved successfully",
-    "data": [
-        {
-            "id": 5,
-            "employee_id": 2,
-            "name": "Richard Kamitono",
-            "role": "unassigned",
-            "shift_type": "day",
-            "date": "2025-05-28"
-        },
-        {
-            "id": 6,
-            "employee_id": 3,
-            "name": "Richard Kamitono",
-            "role": "unassigned",
-            "shift_type": "day",
-            "date": "2025-05-28"
-        },
-        {
-            "id": 1,
-            "employee_id": 4,
-            "name": "Richard Kamitono",
-            "role": "unassigned",
-            "shift_type": "day",
-            "date": "2025-05-28"
-        }
-    ]
+  "message": "Employees on schedule retrieved successfully",
+  "data": [
+    {
+      "id": 5,
+      "employee_id": 1,
+      "name": "Richard Kamitono",
+      "role": "Cashier",
+      "shift_type": "day",
+      "date": "2025-05-28",
+      "attendance": 1
+    }
+  ]
 }
 ```
+
