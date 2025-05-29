@@ -2,7 +2,7 @@
 
 > **⚠️ Disclaimer:** All endpoints documented here are currently under development. Their structure, parameters, or responses may be subject to change without prior notice.
 
-### 1. Register user
+### 1. Register employee
 
 **URL**: `/employee/register`
 
@@ -40,7 +40,7 @@
 
 ---
 
-### 2. Login User
+### 2. Login employee
 
 **URL**: `/employee/login`
 
@@ -78,7 +78,7 @@
 
 ---
 
-### 3. Logout User
+### 3. Logout employee
 
 **URL**: `/employee/logout`
 
