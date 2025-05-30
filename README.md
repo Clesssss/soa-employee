@@ -4,7 +4,7 @@
 
 ### 1. Register employee
 
-**URL**: `/employee/register`
+**URL**: `/employee`
 
 **Method**: `POST`
 
