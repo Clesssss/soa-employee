@@ -245,7 +245,7 @@
 
 **Description**: Allows an employee to update their own profile. Only `name`, `email`, and `password` can be updated.
 
-**Authorization**: Requires access token with `employee` role.
+**Authorization**: Requires access token with the same id as the one being edit.
 
 **Request Header**:
 
