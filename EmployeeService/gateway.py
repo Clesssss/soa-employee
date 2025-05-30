@@ -10,8 +10,15 @@ class GatewayService:
 
     @http('GET', '/employee')
     def get_all_employees(self, request):
-        employees = self.employee_rpc.get_all_employees()
-        return json.dumps({'message': 'Employees retreived successfully', 'data': employees})
+        role = request.args.get('role')
+        search = request.args.get('search')
+
+        employees = self.employee_rpc.get_all_employees(role=role, search=search)
+
+        return json.dumps({
+            'message': 'Employees retrieved successfully',
+            'data': employees
+        })
 
     @http('GET', '/employee/<int:id>')
     def get_employee_by_id(self, request, id):
@@ -48,8 +55,8 @@ class GatewayService:
             email = data.get('email')
             password = data.get('password')
 
-            if name is None or email is None or password is None:
-                return 400, json.dumps({'error': 'Missing attributes'})
+            if not all([name, email, password]):
+                return 400, json.dumps({'error': 'Missing required fields'})
 
             existing_email = self.employee_rpc.get_employee_by_email(email)
             if existing_email:
@@ -58,29 +65,20 @@ class GatewayService:
             new_employee = self.employee_rpc.register_employee(name, email, password)
             return 201, json.dumps({'message': 'Employee registered successfully', 'data': new_employee})
         except Exception as e:
-            return 500, json.dumps({'error': str(e)})
+            return 500, json.dumps({'error': 'Internal server error'})
 
     @http('POST', '/employee/login')
     def login_employee(self, request):
-        try:
-            data = json.loads(request.get_data(as_text=True))
-            email = data.get('email')
-            password = data.get('password')
+        payload = json.loads(request.get_data(as_text=True))
+        email = payload.get('email')
+        password = payload.get('password')
 
-            if not email or not password:
-                return 400, json.dumps({"error": "Missing email or password"})
+        employee_data, error = self.employee_rpc.login_employee(email, password)
 
-            employee_data, error = self.employee_rpc.login_employee(email, password)
-            if error:
-                return 401, json.dumps({"error": error})
+        if error:
+            return 400, json.dumps({'error': error})
 
-            return 200, json.dumps({
-                "message": "User logged in successfully",
-                "data": employee_data
-            })
-
-        except Exception as e:
-            return 500, json.dumps({"error": str(e)})
+        return 200, json.dumps({'message': 'Login successful', 'data': employee_data})
 
     @http('POST', '/employee/logout')
     def logout_employee(self, request):
@@ -95,6 +93,51 @@ class GatewayService:
             return 401, json.dumps({'error': error})
 
         return 200, json.dumps({'message': 'User logged out successfully', 'data': True})
+
+    @http('PUT', '/employee/<int:id>')
+    def update_employee_profile(self, request, id):
+        auth_header = request.headers.get('authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return 401, json.dumps({'error': 'Unauthorized'})
+
+        token = auth_header.split(" ")[1]
+
+        try:
+            requester = self.employee_rpc.get_employee_by_token(token)
+            if not requester:
+                return 401, json.dumps({'error': 'Invalid token'})
+
+            data = json.loads(request.get_data(as_text=True))
+
+            is_self = requester['id'] == id
+            is_manager = requester['role'] == 'manager'
+
+            if is_self:
+                allowed_fields = {'name', 'email', 'password'}
+            elif is_manager:
+                allowed_fields = {'name', 'role', 'salary_per_shift'}
+            else:
+                return 403, json.dumps({'error': 'Forbidden'})
+
+            update_data = {k: v for k, v in data.items() if k in allowed_fields}
+            ignored_fields = [k for k in data.keys() if k not in allowed_fields]
+
+            if not update_data:
+                return 400, json.dumps({
+                    'error': 'No valid fields to update',
+                    'ignored_fields': ignored_fields
+                })
+
+            updated_employee = self.employee_rpc.update_employee(id, update_data)
+
+            return 200, json.dumps({
+                'message': 'Employee updated successfully',
+                'data': updated_employee,
+                'ignored_fields': ignored_fields
+            })
+
+        except Exception as e:
+            return 500, json.dumps({'error': str(e)})
 
     @http('POST', '/employee/schedule')
     def create_schedule(self, request):

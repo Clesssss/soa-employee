@@ -8,11 +8,23 @@ class DatabaseWrapper:
     def __init__(self, connection):
         self.connection = connection
 
-    def get_all_employees(self):
+    def get_all_employees(self, role=None, search=None):
         cursor = self.connection.cursor(dictionary=True)
         result = []
-        sql = "SELECT * FROM employee"
-        cursor.execute(sql)
+
+        sql = "SELECT * FROM employee WHERE 1=1"
+        params = []
+
+        if role:
+            sql += " AND role = %s"
+            params.append(role)
+
+        if search:
+            sql += " AND LOWER(name) LIKE %s"
+            params.append(f"%{search.lower()}%")
+
+        cursor.execute(sql, params)
+
         for row in cursor.fetchall():
             result.append({
                 'id': row['id'],
@@ -21,6 +33,7 @@ class DatabaseWrapper:
                 'role': row['role'],
                 'salary_per_shift': row['salary_per_shift']
             })
+
         cursor.close()
         return result
 
@@ -48,6 +61,33 @@ class DatabaseWrapper:
         employee_id = cursor.lastrowid
         cursor.close()
         return self.get_employee_by_id(employee_id)
+
+    def update_employee(self, id, update_data):
+        if not update_data:
+            raise ValueError("No update data provided")
+
+        print(update_data)
+        cursor = self.connection.cursor(dictionary=True)
+
+        fields = []
+        values = []
+
+        for key, value in update_data.items():
+            fields.append(f"{key} = %s")
+            values.append(value)
+
+        values.append(id)
+        print(fields)
+
+        sql = f"UPDATE employee SET {', '.join(fields)} WHERE id = %s"
+        cursor.execute(sql, tuple(values))
+        self.connection.commit()
+
+        cursor.execute("SELECT id, name, email, role, salary_per_shift FROM employee WHERE id = %s", (id,))
+        updated_employee = cursor.fetchone()
+        cursor.close()
+
+        return updated_employee
 
 
     def save_access_token(self, employee_id: int, token: str) -> bool:

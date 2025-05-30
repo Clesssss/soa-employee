@@ -9,8 +9,8 @@ class EmployeeService:
     database = dependencies.Database()
 
     @rpc
-    def get_all_employees(self):
-        employees = self.database.get_all_employees()
+    def get_all_employees(self, role=None, search=None):
+        employees = self.database.get_all_employees(role=role, search=search)
         return employees
 
     @rpc
@@ -95,6 +95,13 @@ class EmployeeService:
             return False, "Invalid token"
 
         return True, None
+
+    @rpc
+    def update_employee(self, id, update_data):
+        if 'password' in update_data:
+            update_data['password'] = hash_password(update_data['password'])
+
+        return self.database.update_employee(id, update_data)
 
     @rpc
     def create_schedule(self, employee_id, date, shift_type):
