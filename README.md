@@ -283,13 +283,13 @@
 
 ---
 
-### 8. Edit Employee Profile (by Manager/Admin)
+### 8. Edit Employee Profile (by Manager)
 
 **URL**: `/employee/:id`
 
 **Method**: `PUT`
 
-**Description**: Allows a manager or admin to update an employee’s profile. Editable fields include `name`, `role` and `salary_per_shift`.
+**Description**: Allows a manager to update an employee’s profile. Editable fields include `name`, `role` and `salary_per_shift`.
 
 **Authorization**: Requires access token with `manager` role.
 
@@ -297,7 +297,7 @@
 
 ```json
 {
-  "authorization": "Bearer <admin_token>"
+  "authorization": "Bearer <manager_token>"
 }
 ```
 
