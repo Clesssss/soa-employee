@@ -2,9 +2,9 @@
 
 > **⚠️ Disclaimer:** All endpoints documented here are currently under development. Their structure, parameters, or responses may be subject to change without prior notice.
 
-### 1. Register user
+### 1. Register employee
 
-**URL**: `/employee/register`
+**URL**: `/employee`
 
 **Method**: `POST`
 
@@ -40,7 +40,7 @@
 
 ---
 
-### 2. Login User
+### 2. Login employee
 
 **URL**: `/employee/login`
 
@@ -78,7 +78,7 @@
 
 ---
 
-### 3. Logout User
+### 3. Logout employee
 
 **URL**: `/employee/logout`
 
@@ -245,7 +245,7 @@
 
 **Description**: Allows an employee to update their own profile. Only `name`, `email`, and `password` can be updated.
 
-**Authorization**: Requires access token with `employee` role.
+**Authorization**: Requires access token with the same id as the one being edit.
 
 **Request Header**:
 
@@ -283,13 +283,13 @@
 
 ---
 
-### 8. Edit Employee Profile (by Manager/Admin)
+### 8. Edit Employee Profile (by Manager)
 
 **URL**: `/employee/:id`
 
 **Method**: `PUT`
 
-**Description**: Allows a manager or admin to update an employee’s profile. Editable fields include `name`, `role` and `salary_per_shift`.
+**Description**: Allows a manager to update an employee’s profile. Editable fields include `name`, `role` and `salary_per_shift`.
 
 **Authorization**: Requires access token with `manager` role.
 
@@ -297,7 +297,7 @@
 
 ```json
 {
-  "authorization": "Bearer <admin_token>"
+  "authorization": "Bearer <manager_token>"
 }
 ```
 
