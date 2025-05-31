@@ -46,7 +46,7 @@
 
 **Method**: `POST`
 
-**Description**: Login Employee.
+**Description**: Log in an employee.
 
 **Request Body**:
 
@@ -84,13 +84,13 @@
 
 **Method**: `POST`
 
-**Description**: Logout Employee.
+**Description**: Log out the currently authenticated employee.
 
 **Request Header**:
 
 ```json
 {
-  "authorization": "Bearer <token>"
+  "Authorization": "Bearer <token>"
 }
 ```
 
@@ -124,13 +124,13 @@
 
 **Method**: `GET`
 
-**Description**: Retrieve details of a single employee.
+**Description**: Retrieve a single employee's details
 
 **Request Header**:
 
 ```json
 {
-  "authorization": "Bearer <token>"
+  "Authorization": "Bearer <token>"
 }
 ```
 
@@ -160,7 +160,7 @@
 
 **Method**: `GET`
 
-**Description**: Retrieve all employees with optional filters by role and search by name.
+**Description**: Retrieve all employees, optionally filtered by role and name search.
 
 **Query Parameters**:
 
@@ -176,7 +176,7 @@
 
 ```json
 {
-  "authorization": "Bearer <token>"
+  "Authorization": "Bearer <token>"
 }
 ```
 
@@ -208,13 +208,13 @@
 
 **Method**: `GET`  
 
-**Description**: Retrieves details of the currently authenticated employee using the access token.
+**Description**: Retrieves the currently authenticated employee's details using access token.
 
 **Request Header**:
 
 ```json
 {
-  "authorization": "Bearer <token>"
+  "Authorization": "Bearer <token>"
 }
 ```
 
@@ -243,7 +243,7 @@
 
 **Method**: `PUT`
 
-**Description**: Allows an employee to update their own profile. Only `name`, `email`, and `password` can be updated.
+**Description**: Employee can update their own profile (`name`, `email`, and `password`)
 
 **Authorization**: Requires access token with the same id as the one being edit.
 
@@ -251,7 +251,7 @@
 
 ```json
 {
-  "authorization": "Bearer <employee_token>"
+  "Authorization": "Bearer <employee_token>"
 }
 ```
 
@@ -297,7 +297,7 @@
 
 ```json
 {
-  "authorization": "Bearer <manager_token>"
+  "Authorization": "Bearer <manager_token>"
 }
 ```
 
@@ -340,7 +340,7 @@
 
 ```json
 {
-  "authorization": "Bearer <token>"
+  "Authorization": "Bearer <token>"
 }
 ```
 
@@ -385,7 +385,7 @@
 
 ```json
 {
-  "authorization": "Bearer <token>"
+  "Authorization": "Bearer <token>"
 }
 ```
 
@@ -436,7 +436,7 @@
 
 ```json
 {
-  "authorization": "Bearer <token>"
+  "Authorization": "Bearer <token>"
 }
 ```
 
