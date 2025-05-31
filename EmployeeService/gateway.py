@@ -196,13 +196,28 @@ class GatewayService:
         auth_header = request.headers.get('authorization')
         if not auth_header or not auth_header.startswith('Bearer '):
             return 401, json.dumps({'error': 'Unauthorized'})
+
         date = request.args.get('date')
-        shift_type = request.args.get('shift_type')
+        shift_type = request.args.get('shift')
+        role = request.args.get('role')
+        attendance = request.args.get('attendance')
+        search = request.args.get('search')
+
         if not date or not shift_type:
-            return 400, json.dumps({'error': 'Missing query parameters'})
+            return 400, json.dumps({'error': 'Missing required query parameters: date and shift'})
+
         try:
-            result = self.employee_rpc.get_schedule_by_date_shift(date, shift_type)
-            return 200, json.dumps({'message': 'Schedule retrieved successfully', 'data': result})
+            if attendance is not None:
+                attendance = attendance.lower() == 'true'
+
+            result = self.employee_rpc.get_schedule_by_date_shift(
+                date, shift_type, role, attendance, search
+            )
+            return 200, json.dumps({
+                'message': 'Employees on schedule retrieved successfully',
+                'data': result
+            })
+
         except Exception as e:
             return 500, json.dumps({'error': str(e)})
 

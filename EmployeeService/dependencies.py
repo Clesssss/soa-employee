@@ -174,15 +174,30 @@ class DatabaseWrapper:
         cursor.close()
         return updated_row
 
-    def get_schedule_by_date_shift(self, date, shift_type):
+    def get_schedule_by_date_shift(self, date, shift_type, role=None, attendance=None, search=None):
         cursor = self.connection.cursor(dictionary=True)
+
         sql = """
-            SELECT s.id, s.employee_id, e.name, e.role, s.shift_type, s.date
+            SELECT s.id, s.employee_id, e.name, e.role, s.shift_type, s.date, s.attendance
             FROM schedule s
             JOIN employee e ON s.employee_id = e.id
             WHERE s.date = %s AND s.shift_type = %s
         """
-        cursor.execute(sql, (date, shift_type))
+        params = [date, shift_type]
+
+        if role:
+            sql += " AND e.role = %s"
+            params.append(role)
+
+        if attendance is not None:
+            sql += " AND s.attendance = %s"
+            params.append(int(attendance))  # convert boolean to 1 or 0
+
+        if search:
+            sql += " AND LOWER(e.name) LIKE %s"
+            params.append(f"%{search.lower()}%")
+
+        cursor.execute(sql, params)
         result = cursor.fetchall()
         cursor.close()
 
@@ -190,6 +205,7 @@ class DatabaseWrapper:
             row['date'] = row['date'].isoformat()
 
         return result
+
 #    def __del__(self):
 #        self.connection.close()
 
