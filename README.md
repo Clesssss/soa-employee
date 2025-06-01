@@ -1,6 +1,7 @@
 # Endpoints
 
-> **⚠️ Disclaimer:** All endpoints documented here are currently under development. Their structure, parameters, or responses may be subject to change without prior notice.
+> **⚠️ Note:** All of the endpoints listed in this documentation have been tested locally and are currently working. If you encounter any issues accessing them or have questions, please contact the repository owner. There may be changes to request formats, authorization methods, or responses. Always refer back to this documentation or subscribe to the repository for updates.
+
 
 ### 1. Register employee
 
@@ -243,7 +244,7 @@
 
 **Method**: `PUT`
 
-**Description**: Employee can update their own profile (`name`, `email`, and `password`)
+**Description**: Employee can update their own profile (`name`, `email`, `password`)
 
 **Authorization**: Requires access token with the same id as the one being edit.
 
@@ -289,7 +290,7 @@
 
 **Method**: `PUT`
 
-**Description**: Allows a manager to update an employee’s profile. Editable fields include `name`, `role` and `salary_per_shift`.
+**Description**: Manager can update employee’s profil (`name`, `role`, `salary_per_shift`).
 
 **Authorization**: Requires access token with `manager` role.
 
@@ -334,7 +335,7 @@
 
 **Method**: `POST`
 
-**Description**: Create a single employee schedule entry.
+**Description**: Create a schedule for a single employee.
 
 **Request Header**:
 
@@ -379,7 +380,7 @@
 
 **Method**: `POST`
 
-**Description**: Create multiple schedule entries for the same date and shift.
+**Description**: Create schedules for multiple employees on the same `date` and `shift`.
 
 **Request Header**:
 
@@ -428,9 +429,7 @@
 
 **Method**: `PUT`
 
-**Description**: Update an existing schedule entry by ID.
-
-**Note**: Only the note and attendance fields can be updated. If you need to change the employee_id, date, or shift_type, please delete the existing row and create a new one to maintain schedule uniqueness.
+**Description**: Update a schedule entry. Only `note` and `attendance` can be modified.
 
 **Request Header**:
 
@@ -476,7 +475,7 @@
 
 **Method**: `GET`
 
-**Description**: Retrieve employees scheduled on a specific date and shift. Filterable by role, attendance (optional), and searchable by name.
+**Description**: Retrieve scheduled employees filtered by `date`, `shift`, `role`, `attendance`, and `name`.
 
 **Query Parameters**:
 
