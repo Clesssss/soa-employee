@@ -1,6 +1,6 @@
 # Endpoints
 
-> **⚠️ Note:** All of the endpoints listed in this documentation have been tested locally and are currently working. If you encounter any issues accessing them or have questions, please contact the repository owner. There may be changes to request formats, authorization methods, or responses. Always refer back to this documentation or subscribe to the repository for updates.
+> **⚠️ Note:** All of the endpoints listed in this documentation have been tested locally and are currently working. If you encounter any issues accessing them or have questions, please contact the repository owner. Please note that the request formats, authorization methods, or responses may change as development progresses, so always refer back to this documentation or subscribe to the repository for the latest updates.
 
 
 ### 1. Register employee
