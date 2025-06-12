@@ -72,7 +72,7 @@
         "email": "r@gmail.com",
         "role": "unassigned",
         "salary_per_shift": -1,
-        "accessToken": <Token>
+        "access_token": <Token>
     }
 }
 ```
