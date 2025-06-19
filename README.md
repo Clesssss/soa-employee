@@ -475,17 +475,50 @@
 
 **Method**: `GET`
 
-**Description**: Retrieve scheduled employees filtered by `date`, `shift`, `role`, `attendance`, and `name`.
+**Description**: Retrieve scheduled employees with support for date, role, shift, attendance, and other filters. If no parameters are provided, all schedules will be returned.
 
 **Query Parameters**:
 
-| Name        | Type     | Required | Description                                      |
-|-------------|----------|----------|--------------------------------------------------|
-| date        | string   | yes      | Schedule date in format `YYYY-MM-DD`            |
-| shift       | string   | yes      | Shift type: `day` or `night`                    |
-| role        | string   | optional | Filter by role                                  |
-| attendance  | boolean  | optional | Filter by attendance status                     |
-| search      | string   | optional | Search by employee name (case-insensitive match)|
+| Name          | Type    | Required | Description                                 |
+| ------------- | ------- | -------- | ------------------------------------------- |
+| `date`        | string  | ❌ No     | Exact date in `YYYY-MM-DD`.                 |
+| `from_date`   | string  | ❌ No     | Fetch all schedules from this date forward. |
+| `month`       | string  | ❌ No     | Filter by specific month, format `YYYY-MM`. |
+| `shift`       | string  | ❌ No     | `day` or `night`.                           |
+| `role`        | string  | ❌ No     | Employee role.                              |
+| `attendance`  | boolean | ❌ No     | `true` or `false`.                          |
+| `search`      | string  | ❌ No     | Partial name search.                        |
+| `employee_id` | integer | ❌ No     | Specific employee only.                     |
+| `limit`       | integer | ❌ No     | Maximum number of records returned.         |
+
+***Parameter Conflict Rules***   
+To avoid ambiguous filters, the following rules apply:
+
+You may use only one of the following parameters at a time:
+
+- `date`
+- `month`
+- `from_date`
+
+If more than one is provided, the priority is:
+1. date
+2. month
+3. from_date
+
+`shift`, `role`, `attendance`, `employee_id`, and `search` can be used alongside any date filter.
+If `limit` is used with `date`, it will only limit records on that exact date, not future days.
+If `employee_id` is used with `search`, the `employee_id` will take precedence (i.e. it will ignore `search`).
+
+---
+
+***Example Prioritization***
+
+| Query                         | Behavior                                  |
+|-------------------------------|-------------------------------------------|
+| `date`, `month`, `from_date`  | Only `date` is used                       |
+| `month`, `from_date`           | Only `month` is used                      |
+| `from_date`, `shift`, `limit=3`| Fetch 3 upcoming shifts from `from_date` |
+| `employee_id=1`, `search=richard` | Only employee with ID 1 is searched (ignores `search`) |
 
 **Example**:  
 `GET /employee/schedule/employees?date=2025-05-28&shift=day&role=Cashier&attendance=true&search=richard`
