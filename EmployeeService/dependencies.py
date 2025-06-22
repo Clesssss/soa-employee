@@ -1,5 +1,7 @@
 from nameko.extensions import DependencyProvider
 import mysql.connector
+from mysql.connector import pooling
+import time
 
 class DatabaseWrapper:
 
@@ -174,16 +176,34 @@ class DatabaseWrapper:
         cursor.close()
         return updated_row
 
-    def get_schedule_by_date_shift(self, date, shift_type, role=None, attendance=None, search=None):
+    def get_schedule(self, date=None, from_date=None, month=None, shift=None,
+                     role=None, attendance=None, search=None, employee_id=None, limit=None):
         cursor = self.connection.cursor(dictionary=True)
 
         sql = """
             SELECT s.id, s.employee_id, e.name, e.role, s.shift_type, s.date, s.attendance
             FROM schedule s
             JOIN employee e ON s.employee_id = e.id
-            WHERE s.date = %s AND s.shift_type = %s
+            WHERE 1=1
         """
-        params = [date, shift_type]
+        params = []
+
+        # Handle date filters with priority: date > month > from_date
+        if date:
+            sql += " AND s.date = %s"
+            params.append(date)
+        elif month:
+            # Filter by month in 'YYYY-MM' format using LIKE, e.g. '2025-06%'
+            sql += " AND s.date LIKE %s"
+            params.append(f"{month}%")
+        elif from_date:
+            sql += " AND s.date >= %s"
+            params.append(from_date)
+        # else no date filter, fetch all
+
+        if shift:
+            sql += " AND s.shift_type = %s"
+            params.append(shift)
 
         if role:
             sql += " AND e.role = %s"
@@ -191,23 +211,41 @@ class DatabaseWrapper:
 
         if attendance is not None:
             sql += " AND s.attendance = %s"
-            params.append(int(attendance))  # convert boolean to 1 or 0
+            params.append(int(attendance))  # Convert boolean to 0 or 1
 
-        if search:
+        # If employee_id is provided, ignore search
+        if employee_id:
+            sql += " AND s.employee_id = %s"
+            params.append(employee_id)
+        elif search:
             sql += " AND LOWER(e.name) LIKE %s"
             params.append(f"%{search.lower()}%")
+
+        sql += " ORDER BY s.date ASC"
+
+        if limit:
+            sql += " LIMIT %s"
+            params.append(limit)
 
         cursor.execute(sql, params)
         result = cursor.fetchall()
         cursor.close()
 
+        # Convert date to ISO format string
         for row in result:
-            row['date'] = row['date'].isoformat()
+            if isinstance(row['date'], (str, bytes)):
+                # Already string, do nothing or ensure proper format
+                row['date'] = row['date']
+            else:
+                row['date'] = row['date'].isoformat()
+
+            # Optional: convert attendance int (0/1) to boolean for clarity
+            row['attendance'] = bool(row['attendance'])
 
         return result
 
-#    def __del__(self):
-#        self.connection.close()
+    def __del__(self):
+        self.connection.close()
 
 
 class Database(DependencyProvider):
@@ -215,18 +253,28 @@ class Database(DependencyProvider):
     connection_pool = None
 
     def __init__(self):
-        try:
-            self.connection_pool = mysql.connector.pooling.MySQLConnectionPool(
-                pool_name="database_pool",
-                pool_size=10,
-                pool_reset_session=True,
-                host='localhost',
-                database='employee',
-                user='root',
-                password=''
-            )
-        except mysql.connector.Error as e:
-            print ("Error while connecting to MySQL using Connection pool:", e)
+        # Try to connect multiple times with delays
+        retries = 5
+        for attempt in range(retries):
+            try:
+                self.connection_pool = pooling.MySQLConnectionPool(
+                    pool_name="database_pool",
+                    pool_size=10,
+                    pool_reset_session=True,
+                    host='employee-mysql',
+                    database='employee',
+                    user='root',
+                    password=''
+                )
+                print("MySQL connection pool created successfully")
+                break
+            except mysql.connector.Error as e:
+                print(f"Attempt {attempt + 1} - MySQL connection failed: {e}")
+                time.sleep(3)  # wait 3 seconds before retry
+        else:
+            # After retries exhausted
+            print("Failed to connect to MySQL after several attempts.")
+            self.connection_pool = None
 
     def get_dependency(self, worker_ctx):
         return DatabaseWrapper(self.connection_pool.get_connection())

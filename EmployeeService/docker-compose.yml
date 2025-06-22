@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  employee-service:
+    build: .
+    container_name: employee-service
+    depends_on:
+      - employee-mysql
+    environment:
+      - RABBITMQ_HOST=172.31.2.0
+    volumes:
+      - .:/app
+    command: ["nameko", "run", "--config", "config.yml", "employee"]
+
+  employee-mysql:
+    image: mysql:8
+    container_name: employee-mysql
+    restart: always
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: employee
+      MYSQL_ROOT_PASSWORD: ""       # this can be left out or set to an empty string
+    ports: []
+    volumes:
+      - ./mysql-init:/docker-entrypoint-initdb.d
+
+networks:
+  default:
+    name: member-employee
+    external: true

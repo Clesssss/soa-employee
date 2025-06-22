@@ -1,0 +1,5 @@
+nameko
+mysql-connector-python
+bcrypt
+pyjwt
+dotenv

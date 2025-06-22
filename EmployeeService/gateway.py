@@ -192,7 +192,7 @@ class GatewayService:
             return 500, json.dumps({'error': str(e)})
 
     @http('GET', '/employee/schedule')
-    def get_schedule_by_date_shift(self, request):
+    def get_schedule(self, request):
         auth_header = request.headers.get('authorization')
         if not auth_header or not auth_header.startswith('Bearer '):
             return 401, json.dumps({'error': 'Unauthorized'})
@@ -207,11 +207,16 @@ class GatewayService:
             return 400, json.dumps({'error': 'Missing required query parameters: date and shift'})
 
         try:
-            if attendance is not None:
-                attendance = attendance.lower() == 'true'
-
-            result = self.employee_rpc.get_schedule_by_date_shift(
-                date, shift_type, role, attendance, search
+            result = self.employee_rpc.get_schedule(
+                date=filter_date,
+                month=filter_month,
+                from_date=filter_from_date,
+                shift=shift,
+                role=role,
+                attendance=attendance,
+                search=search,
+                employee_id=employee_id,
+                limit=limit
             )
             return 200, json.dumps({
                 'message': 'Employees on schedule retrieved successfully',

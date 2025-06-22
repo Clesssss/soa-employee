@@ -116,6 +116,5 @@ class EmployeeService:
         return self.database.update_schedule(schedule_id, note, attendance)
 
     @rpc
-    def get_schedule_by_date_shift(self, date, shift_type, role=None, attendance=None, search=None):
-        return self.database.get_schedule_by_date_shift(date, shift_type, role, attendance, search)
-
+    def get_schedule(self, date=None, from_date=None, month=None, shift=None, role=None, attendance=None, search=None, employee_id=None, limit=None):
+    	return self.database.get_schedule(date, from_date, month, shift, role, attendance, search, employee_id, limit)
