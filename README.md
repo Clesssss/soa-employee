@@ -1,6 +1,7 @@
 # Endpoints
 
-> **⚠️ Disclaimer:** All endpoints documented here are currently under development. Their structure, parameters, or responses may be subject to change without prior notice.
+> **⚠️ Note:** All of the endpoints listed in this documentation have been tested locally and are currently working. If you encounter any issues accessing them or have questions, please contact the repository owner. Please note that the request formats, authorization methods, or responses may change as development progresses, so always refer back to this documentation or subscribe to the repository for the latest updates.
+
 
 ### 1. Register employee
 
@@ -46,7 +47,7 @@
 
 **Method**: `POST`
 
-**Description**: Login Employee.
+**Description**: Log in an employee.
 
 **Request Body**:
 
@@ -71,7 +72,7 @@
         "email": "r@gmail.com",
         "role": "unassigned",
         "salary_per_shift": -1,
-        "accessToken": <Token>
+        "access_token": <Token>
     }
 }
 ```
@@ -84,13 +85,13 @@
 
 **Method**: `POST`
 
-**Description**: Logout Employee.
+**Description**: Log out the currently authenticated employee.
 
 **Request Header**:
 
 ```json
 {
-  "authorization": "Bearer <token>"
+  "Authorization": "Bearer <token>"
 }
 ```
 
@@ -124,13 +125,13 @@
 
 **Method**: `GET`
 
-**Description**: Retrieve details of a single employee.
+**Description**: Retrieve a single employee's details
 
 **Request Header**:
 
 ```json
 {
-  "authorization": "Bearer <token>"
+  "Authorization": "Bearer <token>"
 }
 ```
 
@@ -160,7 +161,7 @@
 
 **Method**: `GET`
 
-**Description**: Retrieve all employees with optional filters by role and search by name.
+**Description**: Retrieve all employees, optionally filtered by role and name search.
 
 **Query Parameters**:
 
@@ -176,7 +177,7 @@
 
 ```json
 {
-  "authorization": "Bearer <token>"
+  "Authorization": "Bearer <token>"
 }
 ```
 
@@ -208,13 +209,13 @@
 
 **Method**: `GET`  
 
-**Description**: Retrieves details of the currently authenticated employee using the access token.
+**Description**: Retrieves the currently authenticated employee's details using access token.
 
 **Request Header**:
 
 ```json
 {
-  "authorization": "Bearer <token>"
+  "Authorization": "Bearer <token>"
 }
 ```
 
@@ -243,7 +244,7 @@
 
 **Method**: `PUT`
 
-**Description**: Allows an employee to update their own profile. Only `name`, `email`, and `password` can be updated.
+**Description**: Employee can update their own profile (`name`, `email`, `password`)
 
 **Authorization**: Requires access token with the same id as the one being edit.
 
@@ -251,7 +252,7 @@
 
 ```json
 {
-  "authorization": "Bearer <employee_token>"
+  "Authorization": "Bearer <employee_token>"
 }
 ```
 
@@ -289,7 +290,7 @@
 
 **Method**: `PUT`
 
-**Description**: Allows a manager to update an employee’s profile. Editable fields include `name`, `role` and `salary_per_shift`.
+**Description**: Manager can update employee’s profil (`name`, `role`, `salary_per_shift`).
 
 **Authorization**: Requires access token with `manager` role.
 
@@ -297,7 +298,7 @@
 
 ```json
 {
-  "authorization": "Bearer <manager_token>"
+  "Authorization": "Bearer <manager_token>"
 }
 ```
 
@@ -334,13 +335,13 @@
 
 **Method**: `POST`
 
-**Description**: Create a single employee schedule entry.
+**Description**: Create a schedule for a single employee.
 
 **Request Header**:
 
 ```json
 {
-  "authorization": "Bearer <token>"
+  "Authorization": "Bearer <token>"
 }
 ```
 
@@ -379,13 +380,13 @@
 
 **Method**: `POST`
 
-**Description**: Create multiple schedule entries for the same date and shift.
+**Description**: Create schedules for multiple employees on the same `date` and `shift`.
 
 **Request Header**:
 
 ```json
 {
-  "authorization": "Bearer <token>"
+  "Authorization": "Bearer <token>"
 }
 ```
 
@@ -428,15 +429,13 @@
 
 **Method**: `PUT`
 
-**Description**: Update an existing schedule entry by ID.
-
-**Note**: Only the note and attendance fields can be updated. If you need to change the employee_id, date, or shift_type, please delete the existing row and create a new one to maintain schedule uniqueness.
+**Description**: Update a schedule entry. Only `note` and `attendance` can be modified.
 
 **Request Header**:
 
 ```json
 {
-  "authorization": "Bearer <token>"
+  "Authorization": "Bearer <token>"
 }
 ```
 
@@ -476,17 +475,50 @@
 
 **Method**: `GET`
 
-**Description**: Retrieve employees scheduled on a specific date and shift. Filterable by role, attendance (optional), and searchable by name.
+**Description**: Retrieve scheduled employees with support for date, role, shift, attendance, and other filters. If no parameters are provided, all schedules will be returned.
 
 **Query Parameters**:
 
-| Name        | Type     | Required | Description                                      |
-|-------------|----------|----------|--------------------------------------------------|
-| date        | string   | yes      | Schedule date in format `YYYY-MM-DD`            |
-| shift       | string   | yes      | Shift type: `day` or `night`                    |
-| role        | string   | optional | Filter by role                                  |
-| attendance  | boolean  | optional | Filter by attendance status                     |
-| search      | string   | optional | Search by employee name (case-insensitive match)|
+| Name          | Type    | Required | Description                                 |
+| ------------- | ------- | -------- | ------------------------------------------- |
+| `date`        | string  | ❌ No     | Exact date in `YYYY-MM-DD`.                 |
+| `from_date`   | string  | ❌ No     | Fetch all schedules from this date forward. |
+| `month`       | string  | ❌ No     | Filter by specific month, format `YYYY-MM`. |
+| `shift`       | string  | ❌ No     | `day` or `night`.                           |
+| `role`        | string  | ❌ No     | Employee role.                              |
+| `attendance`  | boolean | ❌ No     | `true` or `false`.                          |
+| `search`      | string  | ❌ No     | Partial name search.                        |
+| `employee_id` | integer | ❌ No     | Specific employee only.                     |
+| `limit`       | integer | ❌ No     | Maximum number of records returned.         |
+
+***Parameter Conflict Rules***   
+To avoid ambiguous filters, the following rules apply:
+
+You may use only one of the following parameters at a time:
+
+- `date`
+- `month`
+- `from_date`
+
+If more than one is provided, the priority is:
+1. date
+2. month
+3. from_date
+
+`shift`, `role`, `attendance`, `employee_id`, and `search` can be used alongside any date filter.
+If `limit` is used with `date`, it will only limit records on that exact date, not future days.
+If `employee_id` is used with `search`, the `employee_id` will take precedence (i.e. it will ignore `search`).
+
+---
+
+***Example Prioritization***
+
+| Query                         | Behavior                                  |
+|-------------------------------|-------------------------------------------|
+| `date`, `month`, `from_date`  | Only `date` is used                       |
+| `month`, `from_date`           | Only `month` is used                      |
+| `from_date`, `shift`, `limit=3`| Fetch 3 upcoming shifts from `from_date` |
+| `employee_id=1`, `search=richard` | Only employee with ID 1 is searched (ignores `search`) |
 
 **Example**:  
 `GET /employee/schedule/employees?date=2025-05-28&shift=day&role=Cashier&attendance=true&search=richard`
